@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SpendWise - Expense Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <h1>💸 SpendWise</h1>
+    <ul>
+      <li><a href="#income">Income</a></li>
+      <li><a href="#tracker">Tracker</a></li>
+      <li><a href="#planner">Planner</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <!-- Income card -->
+    <section id="income" class="card animate-on-scroll">
+      <h2>Set Monthly Income</h2>
+      <div class="row">
+        <input type="number" id="monthly-income" placeholder="Enter your monthly income" />
+        <button id="set-income-btn" type="button" class="btn">Set Income</button>
+      <button id="reset-income-btn" class="btn ghost">Reset Income</button>
+
+      </div>
+      <div class="meta-row">
+        <p id="income-display">Income: ₹0</p>
+        <p id="total-expenses-display">Total Expenses: ₹0</p>
+        <p id="balance-display">Balance: ₹0</p>
+      </div>
+    </section>
+
+    <!-- Tracker card -->
+    <section id="tracker" class="card animate-on-scroll">
+      <h2>Daily Expense Tracker</h2>
+
+      <form id="expense-form" aria-label="Add expense" autocomplete="off">
+        <div class="field-with-suggest">
+          <input type="text" id="expense-name" placeholder="Expense name (try: 'uber', 'zomato', 'netflix')" required />
+          <div id="category-suggestions" class="suggestions" hidden></div>
+        </div>
+        <input type="number" id="expense-amount" placeholder="Amount" required min="0" step="0.01"/>
+        <select id="expense-category" required>
+          <option value="">Select category</option>
+          <option value="Food">🍔 Food</option>
+          <option value="Transport">🚗 Transport</option>
+          <option value="Shopping">🛍️ Shopping</option>
+          <option value="Bills">💡 Bills</option>
+          <option value="Other">📦 Other</option>
+        </select>
+        <button type="submit" class="btn">Add Expense</button>
+      </form>
+      <ul id="expense-list"></ul>
+
+      <div class="filter-row">
+        <label for="month-filter">Filter by Month:</label>
+        <input type="month" id="month-filter" />
+        <button id="clear-filter" type="button" class="btn ghost">Clear</button>
+      </div>
+
+      <div class="content-scroll">
+        <!-- Time-series line chart -->
+        <div class="time-chart-wrap">
+          <canvas id="time-chart" aria-label="Daily spend over month"></canvas>
+        </div>
+
+        <!-- Pie chart -->
+        <div class="chart-wrap">
+          <canvas id="expense-chart" aria-label="Expenses by category chart"></canvas>
+        </div>
+
+        <ul id="expense-list" aria-live="polite"></ul>
+        <div id="category-summary" class="summary"></div>
+      </div>
+    </section>
+
+    <!-- Planner card -->
+    <section id="planner" class="card animate-on-scroll">
+      <h2>🧠 What If Proactive Planner</h2>
+      <div class="planner-body">
+        <form id="planner-form">
+          <input type="text" id="planned-desc" placeholder="Planned expense description (e.g., 'New phone')" required />
+          <input type="number" id="planned-expense" placeholder="Planned Expense amount" required min="0" step="0.01" />
+          <select id="planned-category" required>
+            <option value="">Select category</option>
+            <option value="Food">🍔 Food</option>
+            <option value="Transport">🚗 Transport</option>
+            <option value="Shopping">🛍️ Shopping</option>
+            <option value="Bills">💡 Bills</option>
+            <option value="Other">📦 Other</option>
+          </select>
+          <label class="recurring-row"><input type="checkbox" id="planned-recurring" /> Recurring monthly</label>
+          <button type="submit" class="btn">Evaluate</button>
+        </form>
+
+        <div id="planner-result" role="status" class="planner-result"></div>
+
+        <div class="planner-actions">
+          <button id="planner-add-expense" class="btn" disabled>Add to Expenses</button>
+          <button id="planner-clear" class="btn ghost">Clear</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Edit Expense Modal -->
+  <div id="edit-modal" class="modal" aria-hidden="true">
+    <div class="modal-panel">
+      <h3>Edit Expense</h3>
+      <form id="edit-form">
+        <input type="text" id="edit-name" required />
+        <input type="number" id="edit-amount" min="0" step="0.01" required />
+        <select id="edit-category" required>
+          <option value="Food">🍔 Food</option>
+          <option value="Transport">🚗 Transport</option>
+          <option value="Shopping">🛍️ Shopping</option>
+          <option value="Bills">💡 Bills</option>
+          <option value="Other">📦 Other</option>
+        </select>
+        <div class="modal-actions">
+          <button type="submit" class="btn">Save</button>
+          <button type="button" id="edit-cancel" class="btn ghost">Cancel</button>
+        </div>
+      </form>
+      <button class="modal-close" id="edit-close" aria-label="Close modal">&times;</button>
+    </div>
+  </div>
+
+  <!-- Undo toast -->
+  <div id="undo-toast" class="undo-toast" aria-live="assertive" aria-atomic="true" hidden>
+    <div class="undo-msg"></div>
+    <div class="undo-actions">
+      <button id="undo-button" class="btn ghost">Undo</button>
+      <button id="undo-dismiss" class="btn">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- Confetti canvas overlay -->
+  <canvas id="confetti-canvas" class="confetti-canvas" aria-hidden="true"></canvas>
+
+  <button id="scroll-top" aria-label="Scroll to top">⬆️</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+  <!-- Footer Section -->
+<footer class="footer">
+  <p>© 2025 SpendWise – Daily Expense Tracker | Designed for Personal Budget Management</p>
+  <p>Contact: support@spendwise.com | All Rights Reserved </p>
+</footer>
+
+</body>
+</html>
